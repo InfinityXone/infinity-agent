@@ -1,103 +1,188 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDown, Wallet, Cpu, Bot, Settings, Layers, Radar, Code2 } from "lucide-react";
+
+const dummyData = [
+  { name: "BTC", value: 12000 },
+  { name: "ETH", value: 8500 },
+  { name: "SOL", value: 4300 },
+];
+
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState("chat");
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="flex h-screen">
+      {/* Left Sidebar */}
+      <aside className="w-64 glass-bg flex flex-col p-4 space-y-6">
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="text-neonblue text-xl font-bold tracking-wide"
+        >
+          ♾ Infinity UI
+        </motion.div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <nav className="space-y-3">
+          <button
+            className={`w-full text-left px-3 py-2 rounded-md border border-silver hover:text-neonblue ${
+              activeTab === "chat" ? "bg-glass text-neonblue" : "text-white"
+            }`}
+            onClick={() => setActiveTab("chat")}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Chat
+          </button>
+
+          <button
+            className={`w-full text-left px-3 py-2 rounded-md border border-silver hover:text-neonblue ${
+              activeTab === "finance" ? "bg-glass text-neonblue" : "text-white"
+            }`}
+            onClick={() => setActiveTab("finance")}
           >
-            Read our docs
-          </a>
+            Financial Dashboard
+          </button>
+
+          <button
+            className={`w-full text-left px-3 py-2 rounded-md border border-silver hover:text-neonblue ${
+              activeTab === "agents" ? "bg-glass text-neonblue" : "text-white"
+            }`}
+            onClick={() => setActiveTab("agents")}
+          >
+            Agents
+          </button>
+
+          <button
+            className={`w-full text-left px-3 py-2 rounded-md border border-silver hover:text-neonblue ${
+              activeTab === "swarm" ? "bg-glass text-neonblue" : "text-white"
+            }`}
+            onClick={() => setActiveTab("swarm")}
+          >
+            Swarm
+          </button>
+
+          <button
+            className={`w-full text-left px-3 py-2 rounded-md border border-silver hover:text-neonblue ${
+              activeTab === "codex" ? "bg-glass text-neonblue" : "text-white"
+            }`}
+            onClick={() => setActiveTab("codex")}
+          >
+            Codex Mode
+          </button>
+
+          <button
+            className={`w-full text-left px-3 py-2 rounded-md border border-silver hover:text-neonblue ${
+              activeTab === "scraper" ? "bg-glass text-neonblue" : "text-white"
+            }`}
+            onClick={() => setActiveTab("scraper")}
+          >
+            Scraper
+          </button>
+
+          <button
+            className={`w-full text-left px-3 py-2 rounded-md border border-silver hover:text-neonblue ${
+              activeTab === "admin" ? "bg-glass text-neonblue" : "text-white"
+            }`}
+            onClick={() => setActiveTab("admin")}
+          >
+            Super Admin
+          </button>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 p-6 overflow-y-auto">
+        {/* Top Bar */}
+        <div className="flex justify-between items-center mb-6">
+          {/* Model Dropdown */}
+          <Menu as="div" className="relative">
+            <MenuButton className="px-3 py-2 border border-silver rounded-md text-white hover:text-neonblue flex items-center">
+              Model Selector <ChevronDown className="ml-2 h-4 w-4" />
+            </MenuButton>
+            <MenuItems className="absolute mt-2 w-48 glass-bg rounded-md shadow-lg">
+              <MenuItem>
+                <button className="w-full px-4 py-2 text-left hover:text-neonblue">
+                  Groq Mixtral
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button className="w-full px-4 py-2 text-left hover:text-neonblue">
+                  GPT-4 Limitless
+                </button>
+              </MenuItem>
+              <MenuItem>
+                <button className="w-full px-4 py-2 text-left hover:text-neonblue">
+                  Custom Model
+                </button>
+              </MenuItem>
+            </MenuItems>
+          </Menu>
+
+          {/* Account Dropdown */}
+          <Menu as="div" className="relative">
+            <MenuButton className="px-3 py-2 border border-silver rounded-md text-white hover:text-neonblue flex items-center">
+              Accounts <ChevronDown className="ml-2 h-4 w-4" />
+            </MenuButton>
+            <MenuItems className="absolute right-0 mt-2 w-48 glass-bg rounded-md shadow-lg">
+              <MenuItem>
+                <a href="https://supabase.com" className="block px-4 py-2 hover:text-neonblue">
+                  Supabase
+                </a>
+              </MenuItem>
+              <MenuItem>
+                <a href="https://vercel.com" className="block px-4 py-2 hover:text-neonblue">
+                  Vercel
+                </a>
+              </MenuItem>
+              <MenuItem>
+                <a href="https://cloud.google.com" className="block px-4 py-2 hover:text-neonblue">
+                  Google Cloud
+                </a>
+              </MenuItem>
+              <MenuItem>
+                <a href="https://github.com" className="block px-4 py-2 hover:text-neonblue">
+                  GitHub
+                </a>
+              </MenuItem>
+            </MenuItems>
+          </Menu>
         </div>
+
+        {/* Dynamic Tab Rendering */}
+        {activeTab === "chat" && (
+          <div className="space-y-4">
+            <div className="glass-bg p-4 rounded-lg border border-silver">
+              <p className="text-silver">Chat with Infinity Agent...</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "finance" && (
+          <div className="glass-bg p-6 rounded-lg border border-silver">
+            <h2 className="text-xl text-neonblue mb-4">Financial Dashboard</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={dummyData}>
+                <XAxis dataKey="name" stroke="#b0b0b0" />
+                <YAxis stroke="#b0b0b0" />
+                <Tooltip />
+                <Bar dataKey="value" fill="#00e5ff" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {activeTab === "admin" && (
+          <div className="glass-bg p-6 rounded-lg border border-silver">
+            <h2 className="text-xl text-neonblue mb-4">System Overview</h2>
+            <p className="text-silver">
+              View and edit backend settings, API keys, UI themes, and more.
+            </p>
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
