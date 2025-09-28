@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/mnt/data/infinity-agent/gateway.py", line 3, in <module>
-    from codex import run_trance
-  File "/mnt/data/infinity-agent/codex.py", line 3, in <module>
-    import requests
-ModuleNotFoundError: No module named 'requests'
