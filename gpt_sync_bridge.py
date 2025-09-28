@@ -8,14 +8,12 @@ TARGET_DIR = "/mnt/data/infinity-agent"
 PROMPT_DIR = os.path.join(TARGET_DIR, "prompts")
 AGENTS_DIR = os.path.join(TARGET_DIR, "agents")
 UTILS_DIR = os.path.join(TARGET_DIR, "utils")
-MEMORY_DIR = os.path.join(TARGET_DIR, "memory")
 LOG_FILE = os.path.join(TARGET_DIR, "logs/sync_bridge.log")
 
 os.makedirs(SOURCE_DIR, exist_ok=True)
 os.makedirs(PROMPT_DIR, exist_ok=True)
 os.makedirs(AGENTS_DIR, exist_ok=True)
 os.makedirs(UTILS_DIR, exist_ok=True)
-os.makedirs(MEMORY_DIR, exist_ok=True)
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
 def log(msg):
@@ -23,23 +21,10 @@ def log(msg):
         f.write(f"[{time.ctime()}] {msg}\n")
 
 def move_file_smart(src_path, filename):
-    extension = filename.split('.')[-1].lower()
+    extension = filename.split('.')[-1]
     dst_path = None
 
-    # Memory & ingestion trigger
-    if extension in ["sql", "json", "txt", "log", "md"]:
-        dst_path = os.path.join(MEMORY_DIR, filename)
-        shutil.move(src_path, dst_path)
-        log(f"🧠 Moved memory file: {filename}")
-        try:
-            subprocess.run(["python3", "agents/rosetta_ingest_patch.py"], cwd=TARGET_DIR)
-            log(f"✅ Triggered memory ingestion: {filename}")
-        except Exception as e:
-            log(f"❌ Ingestion failed: {e}")
-        return
-
-    # Agent logic
-    elif extension == "py":
+    if extension == "py":
         if "agent" in filename:
             dst_path = os.path.join(AGENTS_DIR, filename)
         elif "util" in filename or "helper" in filename:
@@ -47,9 +32,17 @@ def move_file_smart(src_path, filename):
         else:
             dst_path = os.path.join(TARGET_DIR, filename)
 
-    # Prompt logic
     elif extension == "md":
         dst_path = os.path.join(PROMPT_DIR, filename)
+
+    elif extension in ["sql", "json", "txt"]:
+        dst_path = os.path.join(TARGET_DIR, "data_ingest", filename)
+        os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+        try:
+            subprocess.run(["python3", "scripts/rosetta_ingest.py", dst_path], cwd=TARGET_DIR)
+            log(f"🧠 Triggered memory ingestion for {filename}")
+        except Exception as e:
+            log(f"⚠️ Failed to ingest {filename}: {e}")
 
     else:
         dst_path = os.path.join(TARGET_DIR, filename)
@@ -57,16 +50,16 @@ def move_file_smart(src_path, filename):
     shutil.move(src_path, dst_path)
     log(f"✅ Moved {filename} → {dst_path}")
 
-    # Local Git log only
+def git_log_change(filename):
     try:
         subprocess.run(["git", "add", "."], cwd=TARGET_DIR)
-        subprocess.run(["git", "commit", "-m", f"🔄 Auto-sync: {filename}"], cwd=TARGET_DIR)
+        subprocess.run(["git", "commit", "-m", f"🔄 Auto-integrated: {filename}"], cwd=TARGET_DIR)
         log(f"📦 Git committed {filename}")
     except Exception as e:
         log(f"⚠️ Git commit failed: {e}")
 
-print("🤖 GPT Sync Bridge running...")
-log("🟢 Bridge started.")
+print("🤖 Smart GPT Sync Bridge Running...")
+log("🟢 Sync bridge booted.")
 
 while True:
     files = os.listdir(SOURCE_DIR)
@@ -74,4 +67,6 @@ while True:
         src = os.path.join(SOURCE_DIR, file)
         if os.path.isfile(src):
             move_file_smart(src, file)
+            git_log_change(file)
+
     time.sleep(10)
